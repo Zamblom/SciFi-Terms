@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SciFi Terms</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap');
+
+        :root {
+            --main-border: 2px solid #4a455e;
+            --main-background: #362f49;
+            --main-background-hover: #3b3350;
+            --main-text: #fff;
+            --transparent-text: #fff0;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: "Roboto Mono", sans-serif;
+            color: var(--main-text);
+        }
+
+        html {
+            margin: 0;
+        }
+
+        body {
+            display: flex;
+            margin: 0;
+            width: 100svw;
+            height: 100svh;
+            background-color: var(--main-background);
+        }
+
+        nav {
+            box-sizing: content-box;
+            border-right: var(--main-border);
+            padding: 4px;
+            padding-left: 2px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            
+            * {
+                /* width: 100%; */
+                border: var(--main-border);
+                border-radius: 5px;
+                margin: 0;
+                text-align: center;
+            }
+
+            input {
+                margin-bottom: 3px;
+                padding: 2px 10px;
+                color: #000;
+                position: sticky;
+                margin-left: 10px;
+                margin-right: 5px;
+            }
+
+            p {
+                margin-top: 4px;
+                padding: 2px 10px;
+                background-color: #251c3f;
+                color: #c2c6d1;
+                border-radius: 8px;
+                margin-left: 10px;
+                margin-right: 5px;
+            }
+
+            #nav-results {
+                border: none;
+                overflow-y: auto;
+                display: flex;
+                flex-direction: column;
+                direction: rtl;
+                padding-left: 10px;
+                padding-right: 5px;
+                    
+                button {
+                    min-width: max-content;
+                    margin-top: 2px;
+                    padding: 5px 10px;
+                    background-color: #13092e;
+                }
+
+                button:hover {
+                    background-color: #1d123d;
+                    border: 2px solid #756d96;
+                }
+
+                button.selected {
+                    background-color: #2e1770;
+                    border: 2px solid #2b69a3;
+                }
+
+                button.selected:hover {
+                    background-color: #40209b;
+                    border: 2px solid #3785ce;
+                }                
+            }
+        }
+
+        main {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            min-width: 0;
+            overflow: hidden;
+
+            #resource-name {
+                box-sizing: content-box;
+                border-right: var(--main-border);
+                border-bottom: var(--main-border);
+                border-bottom-right-radius: 12px;
+                width: max-content;
+                padding: 4px 15px;
+                
+                h1 {
+                    margin: 0;
+                    font-size: 2em;
+                    text-wrap: nowrap;
+                    overflow: hidden;
+                }
+            }
+
+            #resource-image {
+                flex-grow: 1;
+
+                img {
+                    max-width: 100%;
+                    max-height: 100%;
+                    position: relative;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                }
+            }
+
+            #resource-description {
+                border-top: var(--main-border);
+                padding: 15px;
+                padding-top: 20px;
+                margin-bottom: 20px;
+
+                p {
+                    margin: 0;
+                    overflow: hidden;
+                }
+            }
+
+            #resource-category {
+                box-sizing: content-box;
+                border-left: var(--main-border);
+                border-top: var(--main-border);
+                border-top-left-radius: 12px;
+                width: max-content;
+                padding: 15px;
+                margin-left: auto;
+
+                h2 {
+                    margin: 0;
+                    font-size: 1.2em;
+                    text-wrap: nowrap;
+                    overflow: hidden;
+                }
+            }
+
+            #resource-category:hover {
+                background-color: var(--main-background-hover);
+            }
+        }
+
+        aside {
+            flex-shrink: 0;
+            width: 30%;
+            border-left: var(--main-border);
+            overflow-y: auto;
+            padding: 20px;
+
+            display: grid;
+            grid-template-rows: repeat(5, calc((100% - 10% * 4) / 5));
+            grid-template-columns: repeat(6, 1fr);
+            row-gap: 10%;
+            column-gap: 0%;
+
+            div {
+                display: flex;
+                justify-content: center;
+            }
+        }
+
+        linkage-node {
+            display: flex;
+            flex-direction: column;
+            max-height: 100%;
+            aspect-ratio: 1;
+            border: 2px solid #000;
+            background-color: #32233b;
+            border-radius: 20px;
+            z-index: 1;
+            transition: opacity 500ms;
+
+            div {
+                flex-grow: 1;
+                justify-content: center;
+
+                img {
+                    object-fit: contain;
+                    max-width: 100%;
+                }
+            }
+
+            p {
+                width: calc(100% - 10px);
+                text-align: center;
+                margin: 5px 0px 8px 5px;
+            }
+        }
+
+        linkage-node:hover {
+            border: 2px solid #1f1f1f;
+            background-color: #573c66;
+        }
+
+        #primary {
+            background-color: #694a2d;
+        }
+
+        #primary:hover {
+            background-color: #91663e;
+        }
+
+        #secondary {
+            background-color: #2f4e33;
+        }
+
+        #secondary:hover {
+            background-color: #45724b;
+        }
+
+        #tertiary {
+            background-color: #2b3d57;
+        }
+
+        #tertiary:hover {
+            background-color: #3f5a80;
+        }
+
+        linkage-node.hidden {
+            opacity: 0;
+        }
+    </style>
+    <script src="leader-line.min.js"></script>
+</head>
+<body>
+    <nav id="nav">
+        <input type="text" id="index-search" onkeyup="search(this.value)">
+        <p id="no-results" hidden>No Results Found</p>
+        <div id="nav-results"></div>
+    </nav>
+    <main>
+        <div id="resource-name"><h1></h1></div>
+        <div id="resource-image"><img alt=""></div>
+        <div id="resource-description"><p></p></div>
+        <div id="resource-category" onclick="searchByCategory(this.firstChild.textContent)"><h2></h2></div>
+    </main>
+    <aside>
+        <div style="grid-row: 1; grid-column-start: 1; grid-column-end: 3;"><linkage-node id="input-0-0"></linkage-node></div>
+        <div style="grid-row: 1; grid-column-start: 2; grid-column-end: 4;"><linkage-node id="input-0-1"></linkage-node></div>
+        <div style="grid-row: 1; grid-column-start: 3; grid-column-end: 5;"><linkage-node id="input-0-2"></linkage-node></div>
+        <div style="grid-row: 1; grid-column-start: 4; grid-column-end: 6;"><linkage-node id="input-0-3"></linkage-node></div>
+        <div style="grid-row: 1; grid-column-start: 5; grid-column-end: 7;"><linkage-node id="input-0-4"></linkage-node></div>
+        
+        <div style="grid-row: 2; grid-column-start: 1; grid-column-end: 3;"><linkage-node id="input-1-0"></linkage-node></div>
+        <div style="grid-row: 2; grid-column-start: 2; grid-column-end: 4;"><linkage-node id="input-1-1"></linkage-node></div>
+        <div style="grid-row: 2; grid-column-start: 3; grid-column-end: 5;"><linkage-node id="input-1-2"></linkage-node></div>
+        <div style="grid-row: 2; grid-column-start: 4; grid-column-end: 6;"><linkage-node id="input-1-3"></linkage-node></div>
+        <div style="grid-row: 2; grid-column-start: 5; grid-column-end: 7;"><linkage-node id="input-1-4"></linkage-node></div>
+
+        <div style="grid-row: 3; grid-column-start: 1; grid-column-end: 3;"><linkage-node id="secondary"></linkage-node></div>
+        <div style="grid-row: 3; grid-column-start: 3; grid-column-end: 5;"><linkage-node id="primary"></linkage-node></div>
+        <div style="grid-row: 3; grid-column-start: 5; grid-column-end: 7;"><linkage-node id="tertiary"></linkage-node></div>
+        
+        <div style="grid-row: 4; grid-column-start: 1; grid-column-end: 3;"><linkage-node id="output-0-0"></linkage-node></div>
+        <div style="grid-row: 4; grid-column-start: 2; grid-column-end: 4;"><linkage-node id="output-0-1"></linkage-node></div>
+        <div style="grid-row: 4; grid-column-start: 3; grid-column-end: 5;"><linkage-node id="output-0-2"></linkage-node></div>
+        <div style="grid-row: 4; grid-column-start: 4; grid-column-end: 6;"><linkage-node id="output-0-3"></linkage-node></div>
+        <div style="grid-row: 4; grid-column-start: 5; grid-column-end: 7;"><linkage-node id="output-0-4"></linkage-node></div>
+        
+        <div style="grid-row: 5; grid-column-start: 1; grid-column-end: 3;"><linkage-node id="output-1-0"></linkage-node></div>
+        <div style="grid-row: 5; grid-column-start: 2; grid-column-end: 4;"><linkage-node id="output-1-1"></linkage-node></div>
+        <div style="grid-row: 5; grid-column-start: 3; grid-column-end: 5;"><linkage-node id="output-1-2"></linkage-node></div>
+        <div style="grid-row: 5; grid-column-start: 4; grid-column-end: 6;"><linkage-node id="output-1-3"></linkage-node></div>
+        <div style="grid-row: 5; grid-column-start: 5; grid-column-end: 7;"><linkage-node id="output-1-4"></linkage-node></div>
+    </aside>
+</body>
+<script id="script-font-maths">
+    function measureText(text, font) {
+        // re-use canvas object for better performance
+        const canvas = measureText.canvas || (measureText.canvas = document.createElement("canvas"));
+        const context = canvas.getContext("2d");
+        context.font = font;
+        return context.measureText(text);
+    }
+
+    function getTextWidth(text, font) {
+        return measureText(text, font).width;
+    }
+
+    function getTextSingleLineHeight(text, font) {
+        const metrics = measureText(text, font);
+        return metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent;
+    }
+
+    function getTextLineCount(text, font, maxWidth) {
+        let lines = 0;
+        for (line of text.split("\n")) {
+            lines += 1;
+            let currentLine = "";
+            for (word of line.split(" ")) {
+                if (currentLine.length !== 0) currentLine += " ";
+                currentLine += word;
+                const width = getTextWidth(currentLine, font);
+                if (width > maxWidth) {
+                    lines += 1;
+                    currentLine = word;
+                }
+            }
+        }
+
+        return lines;
+    }
+
+    function getCssStyle(element, prop) {
+        return window.getComputedStyle(element, null).getPropertyValue(prop);
+    }
+
+    function getCanvasFont(el = document.body) {
+        const fontWeight = getCssStyle(el, 'font-weight') || 'normal';
+        const fontSize = getCssStyle(el, 'font-size') || '16px';
+        const fontFamily = getCssStyle(el, 'font-family') || 'Times New Roman';
+        
+        return `${fontWeight} ${fontSize} ${fontFamily}`;
+    }
+</script>
+<script id="script-functionality">
+    class Resource {
+        constructor(name, description, category, linkage = new Linkage) {
+            if (name === undefined) throw Error("Missing Name");
+            if (description === undefined) throw Error(`Missing Description for ${name}`);
+            if (category === undefined) throw Error(`Missing Category for ${name}`);
+
+            this.name = name;
+            this.searchName = name.replace(/\W/g, '').toLowerCase();
+            this.description = description;
+            this.category = category;
+            this.linkage = linkage;
+            this.indexElement = document.createElement("button");
+        }
+
+        setupA() {
+            this.addToIndex();
+            this.linkage.setupA(this);
+        }
+
+        setupB() {
+            this.linkage.setupB(this);
+        }
+
+        addToIndex() {
+            this.indexElement.textContent = this.name;
+            navResults.append(this.indexElement);
+            this.indexElement.addEventListener("click", this.select);
+        }
+        
+        select = (animated = true) => {
+            if (selected !== null) selected.deselect();
+            this.indexElement.classList.add("selected");
+            this.showInfo(animated);
+            this.linkage.show(this);
+            selected = this;
+        }
+
+        deselect = () => {
+            this.indexElement.classList.remove("selected");
+        }
+
+        showInfo(animated) {
+            animateWidthChange(resourceName, this.name, animated ? 400 : 0, animated ? 0 : 0);
+            animateHeightChange(resourceDescription, this.description, animated ? 600 : 0, animated ? 200 : 0);
+            if (selected === null || this.category !== selected.category) {
+                animateWidthChange(resourceCategory, this.category, animated ? 400 : 0, animated ? 100 : 0);
+            }
+            animateImageChange(resourceImage, `./Images/${this.name}.png`, animated ? 600 : 0, animated ? 200 : 0);
+        }
+
+        show() {
+            this.indexElement.hidden = false;
+        }
+
+        hide() {
+            this.indexElement.hidden = true;
+        }
+    }
+
+    class Linkage {
+        constructor(inputs = [], secondary = null, tertiary = null, secondaryIn = true, tertiaryIn = true) {
+            this.inputs = inputs;
+            this.outputs = [];
+            this.primary = undefined;
+            this.secondary = secondary;
+            this.tertiary = tertiary;
+            this.secondaryIn = secondaryIn;
+            this.tertiaryIn = tertiaryIn;
+        }
+
+        setupA(resource) {
+            this.inputs.forEach((resourceName, i) => {this.inputs[i] = resourceByName(resourceName)});
+            this.primary = resource;
+            if (this.secondary !== null) this.secondary = resourceByName(this.secondary);            
+            if (this.tertiary !== null) this.tertiary = resourceByName(this.tertiary);
+        }
+
+        setupB() {
+            this.inputs.forEach((resource) => {
+                resource.linkage.outputs.push(this.primary);
+            });
+            if (this.secondary !== null) this.secondary.linkage.outputs.push(this.primary);
+            if (this.tertiary !== null) this.tertiary.linkage.outputs.push(this.primary);
+        }
+
+        show() {
+            // Hide all previous links
+            linkageInputs.forEach(r => r.forEach(l => l.hide()));
+            linkageOutputs.forEach(r => r.forEach(l => l.hide()));
+            linkageSecondary.hide();
+            linkageTertiary.hide();
+            
+            // Show Inputs
+            switch (this.inputs.length) {
+                case 0:
+                    break;
+                case 1:
+                    linkageInputs[1][2].show(this.inputs[0], true);
+                    break;
+                case 2:
+                    linkageInputs[1][1].show(this.inputs[1], true);
+                    linkageInputs[1][3].show(this.inputs[0], true);
+                    break;
+                case 3:
+                    linkageInputs[1][0].show(this.inputs[2], true);
+                    linkageInputs[1][4].show(this.inputs[1], true);
+                    linkageInputs[1][2].show(this.inputs[0], true);
+                    break;
+                case 4:
+                    linkageInputs[0][1].show(this.inputs[3], true);
+                    linkageInputs[0][3].show(this.inputs[2], true);
+                    linkageInputs[1][0].show(this.inputs[1], true);
+                    linkageInputs[1][4].show(this.inputs[0], true);
+                    break;
+                case 5:
+                    linkageInputs[0][1].show(this.inputs[4], true);
+                    linkageInputs[0][3].show(this.inputs[3], true);
+                    linkageInputs[1][0].show(this.inputs[2], true);
+                    linkageInputs[1][4].show(this.inputs[1], true);
+                    linkageInputs[1][2].show(this.inputs[0], true);
+                    break;
+                case 6:
+                    linkageInputs[0][0].show(this.inputs[5], true);
+                    linkageInputs[0][2].show(this.inputs[4], true);
+                    linkageInputs[0][4].show(this.inputs[3], true);
+                    linkageInputs[1][0].show(this.inputs[2], true);
+                    linkageInputs[1][2].show(this.inputs[1], true);
+                    linkageInputs[1][4].show(this.inputs[0], true);
+                    break;
+                default:
+                    throw Error("Excessive Inputs");
+            }
+
+            // Show Outputs
+            switch (this.outputs.length) {
+                case 0:
+                    break;
+                case 1:
+                    linkageOutputs[0][2].show(this.outputs[0], false);
+                    break;
+                case 2:
+                    linkageOutputs[0][1].show(this.outputs[1], false);
+                    linkageOutputs[0][3].show(this.outputs[0], false);
+                    break;
+                case 3:
+                    linkageOutputs[0][0].show(this.outputs[2], false);
+                    linkageOutputs[0][4].show(this.outputs[1], false);
+                    linkageOutputs[0][2].show(this.outputs[0], false);
+                    break;
+                case 4:
+                    linkageOutputs[1][1].show(this.outputs[3], false);
+                    linkageOutputs[1][3].show(this.outputs[2], false);
+                    linkageOutputs[0][0].show(this.outputs[1], false);
+                    linkageOutputs[0][4].show(this.outputs[0], false);
+                    break;
+                case 5:
+                    linkageOutputs[1][1].show(this.outputs[4], false);
+                    linkageOutputs[1][3].show(this.outputs[3], false);
+                    linkageOutputs[0][0].show(this.outputs[2], false);
+                    linkageOutputs[0][4].show(this.outputs[1], false);
+                    linkageOutputs[0][2].show(this.outputs[0], false);
+                    break;
+                case 6:
+                    linkageOutputs[1][0].show(this.outputs[5], false);
+                    linkageOutputs[1][2].show(this.outputs[4], false);
+                    linkageOutputs[1][4].show(this.outputs[3], false);
+                    linkageOutputs[0][0].show(this.outputs[2], false);
+                    linkageOutputs[0][2].show(this.outputs[1], false);
+                    linkageOutputs[0][4].show(this.outputs[0], false);
+                    break;
+                default:
+                    throw Error("Excessive Outputs");
+            }
+
+            // Show Others
+            linkagePrimary.show(this.primary);
+            if (this.secondary !== null) linkageSecondary.show(this.secondary, this.secondaryIn);
+            if (this.tertiary !== null) linkageTertiary.show(this.tertiary, this.tertiaryIn);
+        }
+    }
+
+    class LinkageNode extends HTMLElement {
+        constructor() {
+            super();
+
+            this.resource = null;
+
+            const primary = document.getElementById("primary");
+
+            const isInput = this.id.startsWith("input");
+            const isOutput = this.id.startsWith("output");
+            const isTopRow = this.id.includes("-0-");
+            const isPrimary = this.id === "primary";
+            const isSecondary = this.id === "secondary";
+            const isTertiary = this.id === "tertiary";
+
+            if (isInput) {
+                this.inputArrow = new LeaderLine(this, primary, {
+                    hide: true,
+                    startSocket: "bottom",
+                    endSocket: "top",
+                    startPlugColor: "#64A",
+                    endPlugColor: "#A64",
+                    gradient: true,
+                });
+                this.outputArrow = new LeaderLine(primary, this, {
+                    hide: true,
+                });
+            }
+            
+            if (isOutput) {
+                this.inputArrow = new LeaderLine(this, primary, {hide: true});
+                this.outputArrow = new LeaderLine(primary, this, {
+                    hide: true,
+                    startSocket: "bottom",
+                    endSocket: "top",
+                    startPlugColor: "#A64",
+                    endPlugColor: "#64A",
+                    gradient: true,
+                });
+            }
+
+            if (isPrimary) {
+                this.inputArrow = null;
+                this.outputArrow = null;
+            }
+            
+            if (isSecondary) {
+                this.inputArrow = new LeaderLine(this, primary, {
+                    hide: true,
+                    startPlugColor: "#486",
+                    endPlugColor: "#A64",
+                    gradient: true,
+                    startSocketGravity: 5,
+                    endSocketGravity: 5,
+                });
+                this.outputArrow = new LeaderLine(primary, this, {
+                    hide: true,
+                    startPlugColor: "#A64",
+                    endPlugColor: "#486",
+                    gradient: true,
+                    startSocketGravity: 5,
+                    endSocketGravity: 5,
+                });
+            }
+            
+            if (isTertiary) {
+                this.inputArrow = new LeaderLine(this, primary, {
+                    hide: true,
+                    startPlugColor: "#46A",
+                    endPlugColor: "#A64",
+                    gradient: true,
+                    startSocketGravity: 5,
+                    endSocketGravity: 5,
+                });
+                this.outputArrow = new LeaderLine(primary, this, {
+                    hide: true,
+                    startPlugColor: "#A64",
+                    endPlugColor: "#46A",
+                    gradient: true,
+                    startSocketGravity: 5,
+                    endSocketGravity: 5,
+                });
+            }
+        }
+
+        connectedCallback() {
+            this.iconBox = document.createElement("div");
+            this.append(this.iconBox);
+
+            this.icon = document.createElement("img");
+            this.icon.alt = " ";
+            this.iconBox.append(this.icon);
+
+            this.nameBox = document.createElement("p");
+            this.append(this.nameBox);
+
+            this.addEventListener("click", () => {
+                if (this.resource !== null && this.id !== "primary") this.resource.select();
+            });
+        }
+
+        show(resource, directionIn) {
+            this.resource = resource;
+
+            if (this.id !== "primary") {
+                if (directionIn) {
+                    this.inputArrow.show("draw");
+                } else {
+                    this.outputArrow.show("draw");
+                }
+            }
+
+            animateImageChange(this.icon, `./Images/${resource.name}.png`, 500, 300);
+            
+            let fontSize = 15;
+            this.nameBox.style.fontSize = `${fontSize}px`;
+            this.nameBox.style.lineHeight = "20px";
+            
+            while (getTextWidth(resource.name, getCanvasFont(this.nameBox)) > this.nameBox.clientWidth && fontSize > 10) {
+                fontSize -= 1;
+                this.nameBox.style.fontSize = `${fontSize}px`;
+            };
+
+            if (getTextWidth(resource.name, getCanvasFont(this.nameBox)) > this.nameBox.clientWidth) {
+                this.nameBox.style.lineHeight = "10px";
+            }
+            
+            this.nameBox.textContent = resource.name;
+            this.classList.remove("hidden");
+        }
+
+        hide() {
+            animateImageChange(this.icon, "", 500, 300);
+            this.inputArrow.hide("fade");
+            this.outputArrow.hide("fade");
+            this.classList.add("hidden");
+        }
+    }
+    customElements.define("linkage-node", LinkageNode);
+
+    function resourceByName(resourceName) {
+        const res = resources.filter((resource) => {return resource.name === resourceName});
+        if (res.length === 0) {
+            throw Error(`Missing Resource: ${resourceName}`);
+            return;
+        }
+        if (res.length > 1) {
+            throw Error(`Duplicate Resource: ${resourceName}`);
+            return;
+        }
+        return res[0];
+    }
+
+    function animateHeightChange(element, newText, durationMs = 400, delayMs = 0) {
+        element.oldColor = element.oldColor !== undefined ? element.oldColor : element.style.color;
+        element.oldTransition = element.oldTransition !== undefined ? element.oldTransition : element.style.transition;
+        element.users = element.users !== undefined ? element.users + 1 : 1;
+        
+        const font = getCanvasFont(element);
+        const lineCount = getTextLineCount(newText.replaceAll("  ", "&nbsp;"), font, element.clientWidth);
+        const textHeight = element.style.lineHeight.length !== 0 ? element.style.lineHeight : getTextSingleLineHeight(newText, font);
+        const newHeight = textHeight * lineCount;
+
+        // console.log(newText, "LC", lineCount, "TH", textHeight, "NH", newHeight);
+
+        // Wait for Delay
+        setTimeout(() => {
+            // 0% Add Transition, Start Fade Out
+            element.style.transition = `color ${durationMs / 1.5}ms ease-in-out, height ${durationMs / 3}ms ease-in-out`;
+            element.style.color = "#fff0";
+            
+            // 33% Start Resize
+            setTimeout(() => {
+                element.style.height = `${newHeight}px`;
+            }, durationMs / 3);
+
+            // 50% Change Text, Start Fade In
+            setTimeout(() => {
+                element.innerHTML = newText.replaceAll("\n", "<br>").replaceAll("  ", "&nbsp;");
+                element.style.color = element.oldColor;
+            }, durationMs / 2);
+
+            // 100% Remove Transition
+            setTimeout(() => {
+                element.style.transition = element.oldTransition;
+                element.users -= 1;
+                if (element.users === 0) {
+                    element.oldColor = undefined;
+                    element.oldTransition = undefined;
+                    element.users = undefined;
+                }
+            }, durationMs);
+        }, delayMs);
+    }
+
+    function animateWidthChange(element, newText, durationMs = 400, delayMs = 0) {
+        element.oldColor = element.oldColor !== undefined ? element.oldColor : element.style.color;
+        element.oldTransition = element.oldTransition !== undefined ? element.oldTransition : element.style.transition;
+        element.users = element.users !== undefined ? element.users + 1 : 1;
+        
+        const newWidth = getTextWidth(newText, getCanvasFont(element));
+
+        // Wait for Delay
+        setTimeout(() => {
+            // 0% Add Transition, Start Fade Out
+            element.style.transition = `color ${durationMs / 1.5}ms ease-in-out, width ${durationMs / 3}ms ease-in-out`;
+            element.style.color = "#fff0";
+            
+            // 33% Start Resize
+            setTimeout(() => {
+                element.style.width = `${newWidth}px`;
+            }, durationMs / 3);
+
+            // 50% Change Text, Start Fade In
+            setTimeout(() => {
+                element.innerHTML = newText.replaceAll("\n", "<br>");
+                element.style.color = element.oldColor;
+            }, durationMs / 2);
+
+            // 100% Remove Transition
+            setTimeout(() => {
+                element.style.transition = element.oldTransition;
+                element.users -= 1;
+                if (element.users === 0) {
+                    element.oldColor = undefined;
+                    element.oldTransition = undefined;
+                    element.users = undefined;
+                }
+            }, durationMs);
+        }, delayMs);
+    }
+
+    function animateImageChange(imgElement, newSrc, durationMs = 400, delayMs = 0) {
+        setTimeout(() => {
+            imgElement.style.opacity = 0;
+            imgElement.style.transition = `opacity ${durationMs / 2}ms ease-in-out`;
+            setTimeout(() => {
+                imgElement.src = newSrc;
+                imgElement.style.opacity = 1;
+            }, durationMs / 2);
+        }, delayMs);
+    }
+
+    const nav = document.getElementById("nav");
+    const navResults = document.getElementById("nav-results");
+    const indexSearch = document.getElementById("index-search");
+    const noResults = document.getElementById("no-results");
+    const resourceName = document.getElementById("resource-name").firstChild;
+    const resourceImage = document.getElementById("resource-image").firstChild;
+    const resourceDescription = document.getElementById("resource-description").firstChild;
+    const resourceCategory = document.getElementById("resource-category").firstChild;
+
+    const linkageInputs = [
+        [
+            document.getElementById("input-0-0"),
+            document.getElementById("input-0-1"),
+            document.getElementById("input-0-2"),
+            document.getElementById("input-0-3"),
+            document.getElementById("input-0-4"),
+        ], [
+            document.getElementById("input-1-0"),
+            document.getElementById("input-1-1"),
+            document.getElementById("input-1-2"),
+            document.getElementById("input-1-3"),
+            document.getElementById("input-1-4"),
+        ]
+    ];
+    const linkageOutputs = [
+        [
+            document.getElementById("output-0-0"),
+            document.getElementById("output-0-1"),
+            document.getElementById("output-0-2"),
+            document.getElementById("output-0-3"),
+            document.getElementById("output-0-4"),
+        ], [
+            document.getElementById("output-1-0"),
+            document.getElementById("output-1-1"),
+            document.getElementById("output-1-2"),
+            document.getElementById("output-1-3"),
+            document.getElementById("output-1-4"),
+        ]
+    ];
+    const linkagePrimary = document.getElementById("primary");
+    const linkageSecondary = document.getElementById("secondary");
+    const linkageTertiary = document.getElementById("tertiary");
+
+    var selected = null;
+
+    window.addEventListener("load", () => {
+        resources.forEach(resource => resource.setupA());
+        resources.forEach(resource => resource.setupB());
+        lockNavSize();
+        resources[0].select(false);
+    });
+    
+    window.addEventListener("resize", () => {
+        lockNavSize();
+        selected.select(false);
+    });
+
+    function navigate(isUp) {
+        const results = [...navResults.children].filter((el) => {return !el.hidden});
+        if (results.length === 0) return;
+        for (let i=0; i<results.length; i++) {
+            if (results[i].classList.contains("selected")) {
+                if (isUp) {
+                    if (i - 1 >= 0) results[i - 1].click();
+                } else {
+                    if (i + 1 < results.length) results[i + 1].click();
+                }
+                return;
+            }
+        }
+        if (isUp) {
+            results[results.length - 1].click();
+        } else {
+            results[0].click();
+        }
+    };
+
+    window.addEventListener("keydown", () => {
+        switch (event.key) {
+            case "ArrowUp":
+                event.preventDefault();
+                navigate(true);
+                break;
+            case "ArrowDown":
+                event.preventDefault();
+                navigate(false);
+                break;
+            default:
+                break;
+        }
+    });
+
+    function lockNavSize() {
+        search("");
+        nav.style.width = "min-content";
+        setTimeout(() => {
+            const fixedSize = nav.clientWidth
+            nav.style.width = fixedSize + "px";
+            search(indexSearch.value);
+        }, 1);
+    }
+
+    function search(rawTerm) {
+        const term = rawTerm.replace(/\W/g, '').toLowerCase();
+
+        noResults.hidden = false;
+        resources.forEach(resource => {
+            if (resource.searchName.includes(term)) {
+                resource.show();
+                noResults.hidden = true;
+            } else {
+                resource.hide();
+            }
+        });
+    }
+    
+    function searchByCategory(category) {
+        console.log(category);
+        indexSearch.value = "";
+        noResults.hidden = false;
+        resources.forEach(resource => {
+            if (resource.category === category) {
+                resource.show();
+                noResults.hidden = true;
+            } else {
+                resource.hide();
+            }
+        });
+    }
+</script>
+<script id="script-config">
+    const categories = {
+        augments: "Augments",
+        commsTech: "Comms Tech",
+        computation: "Computation",
+        driveTech: "Drive Tech",
+        energyTech: "Energy Tech",
+        fabrication: "Fabrication",
+        gravTech: "Grav Tech",
+        meditech: "Meditech",
+        rawResource: "Raw Resource",
+        shipComponents: "Ship Components",
+        syntheticResource: "Synthetic Resource",
+        warpTech: "Warp Tech",
+        weaponsTech: "Weapons Tech",
+    };
+
+    const resources = [
+        // Augments
+        new Resource("Augment Frames", "The base of any augment technology, heavily utilised for industrial and military purposes.", categories.augments, new Linkage(["SpindleFibre", "MediPlastic"]),),
+        new Resource("PIC", "A Coalition Standard Personal Identification Chipset. Mandated for those who wish to traverse Coalition Space.", categories.augments, new Linkage(["Optical Compute Unit", "Augment Frames"]),),
+        new Resource("Psychic Augments", "A broad categorization of any device capable of amplifying psionic abilities. Such devices range from chip-sized suit modifications all the way up to vast shipboard weapons systems.", categories.augments, new Linkage(["Arcanium", "Augment Frames"]),),
+        
+        // Comms Tech
+        new Resource("Hard Light Transceiver", "An Optical Condenser technology utilised in the transmission of FTL communications.\n\nEach Transceiver is manufactured with a unique Atomic Idenity Stamp (AIS) and tampering with its lattice voids any and all warranties in addition to breaking several laws.", categories.commsTech, new Linkage(["Optical Compute Unit", "Quasi-Optic Transcoder"], "Recrystallizer"),),
+        
+        // Computation
+        new Resource("Optical Compute Unit", "A galactic standard Optical FPGA, suitable for mass fabrication and use.", categories.computation,),
+        new Resource("Quasi-Optic Transcoder", "A standard interface chipset for converting between optic and non-optic compute subsystems.", categories.computation,),
+
+        // Drive Tech
+        new Resource("Entrolabe", "An instrument cluster who's sole purpose is the spacial and temporal location of its host craft.", categories.driveTech, new Linkage(["Magnetic Alloys", "Precious Metals", "Arcanium", "Optical Compute Unit"], "Recrystallizer", "Shipwrights' Tools"),),
+        new Resource("Gravitic Drive", "The standard in-atmosphere ship thrusters, capable of efficiently turning electrical impuse into EndoGravitition.", categories.driveTech, new Linkage(["Gravistatic Array", "Quasi-Optic Transcoder", "Phononic AntiResonator"]),),
+        new Resource("Matter Drive", "A long-obsolete form of propulsion technology that worked by emitting proton-neutron jets.\n\nSuch drives were limited by the Tyranny of the Rocket Equation and quickly died out following the invention of less finite engine systems.", categories.driveTech,),
+        new Resource("Thrust Cluster", "A ship subsystem dedicated to maneouvring and traversal, typically tightly bonded with a vessel's Warp Core for accurate stellar and interstellar positioning.", categories.driveTech, new Linkage(["Gravitic Drive", "SubLight Drive", "Entrolabe"]), "Orbital Shipyard",),
+        new Resource("SubLight Drive", "Traversing sub-warp stellar distances is achieved primarily by the use of the SubLight Drive.\n\nThough several varieties exist, including and ExoGravitic variation of the Gravitic Drive, the most common type uses electrical discharge and vacuum pressure to exert thrust on the attached vessel.", categories.driveTech, new Linkage(["Gravistatic Array", "Quasi-Optic Transcoder", "MeFeLiM3", "Phononic AntiResonator"]),),
+        
+        // Energy Tech
+        new Resource("ActiveMesh", "A high-entropy dynamic lattice that reconfigures its internal structure in response to quantum-electrical signalling.\n\nIts primary use, among others, is as dynamic cooling membranes for high-power heat dissipation.", categories.energyTech, new Linkage(["Quasi-Optic Transcoder", "Arcanium", "Precious Metals"])),
+        new Resource("Power Cells", "Whenever a company spins up a drone, or rolls the newest Mech prototype off a production line, you can be sure that somewhere in there lies a Power Cell.\n\nThese robust, portable, and long-lifetime cells may not have given birth to the robotics industry, but it's safe to say they've changed it forever.", categories.energyTech, new Linkage(["Hydrogen", "MeFeLiM3"]),),
+        new Resource("CycloRefusion Reactor", "The pinnacle of energy generation.\n\nCycloRefusion fuel cells form bistable subatomic configurations wherein phase changes release small amounts of energy in both the up and down directions.\n\nModulation of the surrounding waveform to control non-planar transformations leads to what users of the technology lovingly call \"Free Energy\".", categories.energyTech, new Linkage(["Plasteel", "Magnetic Alloys", "Precious Metals", "ActiveMesh", "Gravistatic Array", "MeFeLiM3"], "Recrystallizer", "HiEnergy Laboratory"),),
+        new Resource("HiEnergy Laboratory", "It takes a brave man to work in the depths of a HiEnergy Laboratory, and an even braver one to set aside funds, land, and manpower to build a facility capable of turning into a bomb at the slightest malfunction.\n\nNonetheless, those who successful enter the venture often stand to make a grand sum in return.", categories.energyTech,),
+        
+        // Fabrication
+        new Resource("Recrystallizer", "A key installation in any foundary worthy of your business.\n\nRecrystallizers take vast amounts of energy and condense it directly into atom-perfect lattices via Photon Precipitation.\n\nTheir huge cost and subpar efficiency limit their widespread adoption but for several high-profile jobs, nothing else will do.", categories.fabrication, new Linkage(["CycloRefusion Reactor"]),),
+
+        // Grav Tech
+        new Resource("Gravistatic Anomaly", "A pinhole in space time, at least that's what the marketing says.\n\nNo one outside of the company that produces them knows quite how they are created.", categories.gravTech, ),
+        new Resource("Gravistatic Array", "A configurable array of Grav Tech capable of providing artifical gravity and lift to even the largest of structures.\n\nThe largest arrays can span for miles along winding station corridors.", categories.gravTech, new Linkage(["Gravistatic Anomaly", "Plasteel"]),),
+        new Resource("Hydrospur", "Hydrospurs stand as grand testament to the power of synthetic gravity. Vast plumes of gas and matter are chanelled upwards from planet surfaces to high orbit collection facilities.\n\nSuch technology first accompanied, then completely negated the need for Space Elevators in natural fluid harvesting.", categories.gravTech, new Linkage(["Gravistatic Array"]),),
+        
+        // Meditech
+        new Resource("Neutroamine", "A mass produced synthetic base for all manner of drugs, medicines, and chemical substances. One of the most important chemicals of the modern galactic economy.", categories.meditech,),
+        new Resource("Medicine", "Multiple varieties of organic, synthetic, and chemical remedies to cure all but the most stubborn of ailments.", categories.meditech, new Linkage(["MediPlastic", "Neutroamine"]),),
+
+        // Raw Resource
+        new Resource("Arcanium", "Psychoactive crystaline structures that can amplify and focus psyonic abilities.\n\nIn addition to their prevelant use within Psychic Augments, they play a key role in the functionality of Warp Cores.", categories.rawResource,),
+        new Resource("Hydrogen", "The most abundant of the elements. Hydrogen is harvested en-masse from ocean and gas worlds to fuel the ever growing needs of the galactic economy.\n\nThe sheer volumes of hydrogen able to be harvested have led to it's position at the forefront of the Power Cell Industry.", categories.rawResource, new Linkage([], "Hydrospur"),),
+        new Resource("MeFeLiM3", "The only known low-pressure high-temperature superconducting substrate.\n\nMeFeLiM3 forms the basis of most super-high-efficiency Power Tech and, accordingly, extensive mining operations work day and night to harvest the hazardous naturally occuring resource.", categories.rawResource,),
+        new Resource("Precious Metals", "Even the advances of the 31st Century can't combat the hard and fast rarities present within the universe.\n\nThese resources may have much potential, but are far too lacking to find widespread use outside of the most specialist foundaries.", categories.rawResource,),
+        new Resource("Volumite", "A raw resource used in several high importance metallurgic processes.", categories.rawResource,),
+        
+        // Ship Components
+        new Resource("Interstellar Vessel", "The culmination of centuries of progress: A vessel that can traverse the stars themselves.", categories.shipComponents, new Linkage(["Ship Hull", "Warp Core", "Weapons Tech", "Thrust Cluster", "Power Cells"], "Shipwrights' Tools", "Orbital Shipyard"),),
+        new Resource("Orbital Shipyard", "The ever increasing size of vessels quickly outpaced the means to lift their parts efficiently from the gravity wells in which they were built.\n\nTo solve this problem, all but the smallest of ships are fabricated in orbit, within vast megashipyards that circle endlessly above their now obsolete land-based counterparts.", categories.shipComponents,),
+        new Resource("Phononic AntiResonator", "An acoustically-coupled active membrane that enables near-perfect sound deadening in mundane materials.\n\nIncredibly useful for compensating the deafening roar of powerful ship engines.", categories.shipComponents, new Linkage(["ActiveMesh", "Optical Compute Unit", "Quasi-Optic Transcoder"]),),
+        new Resource("Ship Hull", "A key part of any star-going vessel.\n\nThe thin line between having a ride home... and not.", categories.shipComponents, new Linkage(["Plasteel", "Precious Metals"], "Shipwrights' Tools"),),
+        new Resource("Shipwrights' Tools", "Vast foundaries, huge facilities, and orbital dry docks are all necessary tools in the manufacture of the flagships, cargohaulers, and pleasure craft of the galaxy.", categories.shipComponents,),
+        
+        // Synthetic Resource
+        new Resource("Explosive Gel", "A quasi-stable detonatable gel suited to a wide range of industrial and military uses.\n\nOnce a strictly controlled substance, it's abundance and widespread necessity has made it impossible to maintain complete control.", categories.syntheticResource,),
+        new Resource("Hyperweave", "Hyperweave, much like Simthread, is a super-durable synthetic rubber.\n\nHyperweave's catalytic production process lends it a far improved resilience to impact and environmental damage. As such, it is often found in Military technology and high-risk scientific installations.", categories.syntheticResource,),
+        new Resource("Magnetic Alloys", "A variety of composite materials that demonstrate high magnetic potential.\n\nSuch material discoveries are prized for their properties, especially for use in valuable interstellar Warp Cores.", categories.syntheticResource,),
+        new Resource("MediPlastic", "A self-sterilizing polymated structure useful for retaining sanitary conditions with little maintenance.\n\nProlongued exposure may result in autosanitation - NexusTech accepts no liability.", categories.syntheticResource,),
+        new Resource("Plasteel", "A durable metallic resource used in the manufacture of high tolerance structures and equipment.", categories.syntheticResource, new Linkage(["Volumite"])),
+        new Resource("Simthread", "One of the Chemical Industries two flavours of mass-producible synthetic rubber along with Hyperweave.\n\nUnlike Hyperweave, Simthread finds its use primarily in civilian applications.", categories.syntheticResource,),
+        new Resource("SpindleFibre", "A complex nano structure that forms the synthetic neural connections within most modern augments.", categories.syntheticResource,),
+        
+        // Warp Tech
+        new Resource("AntiDecompensator", "A critical component of both Dependant and Independant Warp Cores.\n\nWithout an AntiDecompensator, the Abulien forces across the vessel's hull would remain unnormalized, proving fatal for both the craft, and the crew within.", categories.warpTech, new Linkage(["Optical Compute Unit", "Power Cells", "Arcanium"]),),
+        new Resource("Core Ignition Facility", "Igniting a Warp Core is no easy feat, and few facilities boast the required technology and infrastructure to churn out such specialised devices.\n\nSuch worlds are often kept secret to prevent them becoming targets in times of war.", categories.warpTech,),
+        new Resource("Warp Core", "The most complicated piece of technology aboard any given ship, and in most planetary sectors.\n\nThe ability to punch a hole through space-time comes, of course, with a hefty pricetag.\n\nWarp Cores exist mainly in two varieties:\n    Independant Cores carry the power transport themselves across the galaxy.\n    Dependant ones are relagated to traversing the predefined and government regulated Warp Corridors of the galaxy.", categories.warpTech, new Linkage(["Magnetic Alloys", "Arcanium", "AntiDecompensator"], "Warp Fabricator", "Core Ignition Facility"),),
+        new Resource("Warp Fabricator", "In order to induce the Abulien Field ripples required for Warp Core sythesis, vast planetary-scale machines must excitate space-time with exacting coordination.\n\nThe few structures capable of such a feat are both top-secret, and highly dangerous.\n\nThose caught within the generated ripples rarely have time to realise their mistake.", categories.warpTech, new Linkage(["Gravistatic Array"]),),
+        
+        // Weapons Tech
+        new Resource("Armored Plating", "A careful balance between sturdy Plasteel plates and flexible Hyperweave joints makes for the cutting edge in personal and ground craft protection.", categories.weaponsTech, new Linkage(["Plasteel", "Hyperweave"]),),
+        new Resource("Focal Scatterer", "An active radar inhibitor that uses microgravitic cavitations to distort the long wave radio spectrum.", categories.weaponsTech, new Linkage(["Gravistatic Array", "Optical Compute Unit", "Quasi-Optic Transcoder"])),
+        new Resource("Weapons Tech", "An umbrella term for the creation or augmentation of offensive capabilities, either hand-held, craft-mounted, or shipboard.", categories.weaponsTech, new Linkage(["Psychic Augments", "Explosive Gel", "Power Cells"], "HiEnergy Laboratory"),),
+    ].sort((a, b) => {return a.name < b.name ? -1 : a.name > b.name ? 1 : 0;});
+</script>
+</html>
