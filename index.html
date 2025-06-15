@@ -44,7 +44,6 @@
             flex-direction: column;
             
             * {
-                /* width: 100%; */
                 border: var(--main-border);
                 border-radius: 5px;
                 margin: 0;
@@ -151,29 +150,49 @@
                 }
             }
 
-            #resource-category {
-                box-sizing: content-box;
-                border-left: var(--main-border);
-                border-top: var(--main-border);
-                border-top-left-radius: 12px;
-                width: max-content;
-                padding: 15px;
-                margin-left: auto;
+            #resource-footer {
+                display: flex;
+                justify-content: space-between;
+                min-width: 100%;
+                max-width: 100%;
 
-                h2 {
-                    margin: 0;
-                    font-size: 1.2em;
-                    text-wrap: nowrap;
-                    overflow: hidden;
+                > * {
+                    border: 0;
+                    inset: 0;
+                    border-top: var(--main-border);
+                    background-color: var(--main-background);
+                    padding: 15px;
+                    width: max-content;
+
+                    h2 {
+                        margin: 0;
+                        font-size: 1.2em;
+                        text-wrap: nowrap;
+                        overflow: hidden;
+                    }
                 }
-            }
+            
+                > *:hover {
+                    background-color: var(--main-background-hover);
+                }
 
-            #resource-category:hover {
-                background-color: var(--main-background-hover);
+                #show-aside {
+                    border-right: var(--main-border);
+                    border-top-right-radius: 12px;
+                    display: none;
+                }
+
+                #resource-category {
+                    box-sizing: content-box;
+                    border-left: var(--main-border);
+                    border-top-left-radius: 12px;
+                    margin-left: auto;
+                }
             }
         }
 
         aside {
+            height: 100%;
             flex-shrink: 0;
             width: 30%;
             border-left: var(--main-border);
@@ -205,6 +224,8 @@
 
             div {
                 flex-grow: 1;
+                flex-shrink: 1;
+                max-height: 70%;
                 justify-content: center;
 
                 img {
@@ -216,6 +237,7 @@
             p {
                 width: calc(100% - 10px);
                 text-align: center;
+                margin: 0;
                 margin: 5px 0px 8px 5px;
             }
         }
@@ -252,6 +274,79 @@
         linkage-node.hidden {
             opacity: 0;
         }
+        
+        @media only screen and (max-width: 600px) {
+            body {
+                flex-direction: column;
+            }
+
+            nav {
+                min-width: 100%;
+                max-width: 100%;
+                padding: 4px 0;
+                border-right: none;
+                
+                input {
+                    margin-left: 5px;
+                }
+
+                p {
+                    margin-left: 5px;
+                }
+
+                #nav-results {
+                    padding-left: 5px;
+                }
+            }
+
+            nav.hidden {
+                min-height: 0;
+                max-height: 0;
+                padding: 0;
+                overflow-x: hidden;
+            }
+
+            main {
+                min-width: 100%;
+                max-width: 100%;
+
+                #resource-name {
+                    h1 {
+                        font-size: 1.5em;
+                    }
+                }
+                
+                #resource-footer {
+                    #show-aside {
+                        display: block;
+                    }
+                }
+            }
+
+            main.hidden {
+                min-height: 0;
+                max-height: 0;
+                overflow-x: hidden;
+            }
+
+            aside {
+                min-width: 100%;
+                max-width: 100%;
+                border-left: none;
+            }
+            
+            aside.hidden {
+                min-height: 0;
+                max-height: 0;
+                padding: 0;
+                overflow-x: hidden;
+            }
+
+            linkage-node {
+                padding-bottom: 20px;
+            }
+        }
+
     </style>
     <script src="leader-line.min.js"></script>
 </head>
@@ -261,13 +356,16 @@
         <p id="no-results" hidden>No Results Found</p>
         <div id="nav-results"></div>
     </nav>
-    <main>
-        <div id="resource-name"><h1></h1></div>
+    <main id="main">
+        <div id="resource-name" onclick="showNavMobile()"><h1></h1></div>
         <div id="resource-image"><img alt=""></div>
         <div id="resource-description"><p></p></div>
-        <div id="resource-category" onclick="searchByCategory(this.firstChild.textContent)"><h2></h2></div>
+        <div id="resource-footer">
+            <button id="show-aside" onclick="showAsideMobile()"><h2>Links</h2></button>
+            <button id="resource-category" onclick="searchByCategory(this.firstChild.textContent)"><h2></h2></button>
+        </div>
     </main>
-    <aside>
+    <aside id="aside">
         <div style="grid-row: 1; grid-column-start: 1; grid-column-end: 3;"><linkage-node id="input-0-0"></linkage-node></div>
         <div style="grid-row: 1; grid-column-start: 2; grid-column-end: 4;"><linkage-node id="input-0-1"></linkage-node></div>
         <div style="grid-row: 1; grid-column-start: 3; grid-column-end: 5;"><linkage-node id="input-0-2"></linkage-node></div>
@@ -361,7 +459,9 @@
             this.indexElement = document.createElement("button");
             this.image = new Image();
             this.image.src = `./Images/${this.name}.png`;
-            this.icon = this.image.cloneNode();
+            this.iconPST = this.image.cloneNode();
+            this.iconInput = this.image.cloneNode();
+            this.iconOutput = this.image.cloneNode();
         }
 
         setupA() {
@@ -392,6 +492,8 @@
         }
 
         showInfo(animated) {
+            animated |= !isMobile();
+            if (isMobile()) showMainMobile();
             animateWidthChange(resourceName, this.name, animated ? 400 : 0, animated ? 0 : 0);
             animateHeightChange(resourceDescription, this.description, animated ? 600 : 0, animated ? 200 : 0);
             if (selected === null || this.category !== selected.category) {
@@ -536,17 +638,20 @@
             super();
 
             this.resource = null;
-
+            
             const primary = document.getElementById("primary");
 
-            const isInput = this.id.startsWith("input");
-            const isOutput = this.id.startsWith("output");
-            const isTopRow = this.id.includes("-0-");
-            const isPrimary = this.id === "primary";
-            const isSecondary = this.id === "secondary";
-            const isTertiary = this.id === "tertiary";
+            this.isInput = this.id.startsWith("input");
+            this.isOutput = this.id.startsWith("output");
+            this.isPrimary = this.id === "primary";
+            this.isSecondary = this.id === "secondary";
+            this.isTertiary = this.id === "tertiary";
 
-            if (isInput) {
+            this.setArrows();
+        }
+            
+        setArrows() {
+            if (this.isInput) {
                 this.inputArrow = new LeaderLine(this, primary, {
                     hide: true,
                     startSocket: "bottom",
@@ -554,13 +659,15 @@
                     startPlugColor: "#64A",
                     endPlugColor: "#A64",
                     gradient: true,
+                    startSocketGravity: isMobile() ? 5 : null,
+                    endSocketGravity: isMobile() ? 5 : null,
                 });
                 this.outputArrow = new LeaderLine(primary, this, {
                     hide: true,
                 });
             }
             
-            if (isOutput) {
+            if (this.isOutput) {
                 this.inputArrow = new LeaderLine(this, primary, {hide: true});
                 this.outputArrow = new LeaderLine(primary, this, {
                     hide: true,
@@ -569,15 +676,17 @@
                     startPlugColor: "#A64",
                     endPlugColor: "#64A",
                     gradient: true,
+                    startSocketGravity: isMobile() ? 5 : null,
+                    endSocketGravity: isMobile() ? 5 : null,
                 });
             }
 
-            if (isPrimary) {
+            if (this.isPrimary) {
                 this.inputArrow = null;
                 this.outputArrow = null;
             }
             
-            if (isSecondary) {
+            if (this.isSecondary) {
                 this.inputArrow = new LeaderLine(this, primary, {
                     hide: true,
                     startPlugColor: "#486",
@@ -596,7 +705,7 @@
                 });
             }
             
-            if (isTertiary) {
+            if (this.isTertiary) {
                 this.inputArrow = new LeaderLine(this, primary, {
                     hide: true,
                     startPlugColor: "#46A",
@@ -628,34 +737,40 @@
             this.append(this.nameBox);
 
             this.addEventListener("click", () => {
-                if (this.resource !== null && this.id !== "primary") this.resource.select();
+                if (this.resource !== null && (this.id !== "primary" || isMobile())) this.resource.select(!isMobile());
             });
         }
 
         show(resource, directionIn) {
+            if (isMobile() && !aside.classList.contains("hidden")) this.setArrows();
+            
             this.resource = resource;
 
-            if (this.id !== "primary") {
+            if (!this.isPrimary) {
                 if (directionIn) {
-                    this.inputArrow.show("draw");
+                    if (!aside.classList.contains("hidden")) this.inputArrow.show("draw");
                 } else {
-                    this.outputArrow.show("draw");
+                    if (!aside.classList.contains("hidden")) this.outputArrow.show("draw");
                 }
             }
 
-            animateImageChange(this.icon, resource.icon, 500, 300);
+            const animated = !isMobile();
+            const image = (this.isPrimary || this.isSecondary || this.isTertiary) ? resource.iconPST : (this.isInput ? resource.iconInput : (this.isOutput ? resource.iconOutput : null));
+            animateImageChange(this.icon, image, animated ? 500 : 0, animated ? 300 : 0);
             
             let fontSize = 15;
             this.nameBox.style.fontSize = `${fontSize}px`;
             this.nameBox.style.lineHeight = "20px";
+
+            const minSize = isMobile() ? 5 : 10;
             
-            while (getTextWidth(resource.name, getCanvasFont(this.nameBox)) > this.nameBox.clientWidth && fontSize > 10) {
+            while (getTextWidth(resource.name, getCanvasFont(this.nameBox)) > this.nameBox.clientWidth && fontSize > minSize) {
                 fontSize -= 1;
                 this.nameBox.style.fontSize = `${fontSize}px`;
             };
 
             if (getTextWidth(resource.name, getCanvasFont(this.nameBox)) > this.nameBox.clientWidth) {
-                this.nameBox.style.lineHeight = "10px";
+                this.nameBox.style.lineHeight = `${minSize}px`;
             }
             
             this.nameBox.textContent = resource.name;
@@ -663,9 +778,10 @@
         }
 
         hide() {
-            animateImageChange(this.icon, null, 500, 300);
-            this.inputArrow.hide("fade");
-            this.outputArrow.hide("fade");
+            const animated = !isMobile();
+            animateImageChange(this.icon, null, animated ? 500 : 0, animated ? 300 : 0);
+            this.inputArrow.hide("fade", animated ? null : {duration: 1});
+            this.outputArrow.hide("fade", animated ? null : {duration: 1});
             this.classList.add("hidden");
         }
     }
@@ -695,36 +811,44 @@
         const textHeight = element.style.lineHeight.length !== 0 ? element.style.lineHeight : getTextSingleLineHeight(newText, font);
         const newHeight = textHeight * lineCount;
 
-        // console.log(newText, "LC", lineCount, "TH", textHeight, "NH", newHeight);
+        function animateHeightChange2() {
+            if (durationMs === 0) {
+                element.innerHTML = newText.replaceAll("\n", "<br>").replaceAll("  ", "&nbsp;");
+            } else {
+                // 0% Add Transition, Start Fade Out
+                element.style.transition = `color ${durationMs / 1.5}ms ease-in-out, height ${durationMs / 3}ms ease-in-out`;
+                element.style.color = "#fff0";
+                
+                // 33% Start Resize
+                setTimeout(() => {
+                    element.style.height = `${newHeight}px`;
+                }, durationMs / 3);
+
+                // 50% Change Text, Start Fade In
+                setTimeout(() => {
+                    element.innerHTML = newText.replaceAll("\n", "<br>").replaceAll("  ", "&nbsp;");
+                    element.style.color = element.oldColor;
+                }, durationMs / 2);
+
+                // 100% Remove Transition
+                setTimeout(() => {
+                    element.style.transition = element.oldTransition;
+                    element.users -= 1;
+                    if (element.users === 0) {
+                        element.oldColor = undefined;
+                        element.oldTransition = undefined;
+                        element.users = undefined;
+                    }
+                }, durationMs);
+            }
+        }
 
         // Wait for Delay
-        setTimeout(() => {
-            // 0% Add Transition, Start Fade Out
-            element.style.transition = `color ${durationMs / 1.5}ms ease-in-out, height ${durationMs / 3}ms ease-in-out`;
-            element.style.color = "#fff0";
-            
-            // 33% Start Resize
-            setTimeout(() => {
-                element.style.height = `${newHeight}px`;
-            }, durationMs / 3);
-
-            // 50% Change Text, Start Fade In
-            setTimeout(() => {
-                element.innerHTML = newText.replaceAll("\n", "<br>").replaceAll("  ", "&nbsp;");
-                element.style.color = element.oldColor;
-            }, durationMs / 2);
-
-            // 100% Remove Transition
-            setTimeout(() => {
-                element.style.transition = element.oldTransition;
-                element.users -= 1;
-                if (element.users === 0) {
-                    element.oldColor = undefined;
-                    element.oldTransition = undefined;
-                    element.users = undefined;
-                }
-            }, durationMs);
-        }, delayMs);
+        if (delayMs === 0) {
+            animateHeightChange2();
+        } else {
+            setTimeout(animateHeightChange2, delayMs);
+        }
     }
 
     // Takes an element containing no children and any text and animates the width change to the new text.
@@ -735,50 +859,75 @@
         
         const newWidth = getTextWidth(newText, getCanvasFont(element));
 
-        // Wait for Delay
-        setTimeout(() => {
-            // 0% Add Transition, Start Fade Out
-            element.style.transition = `color ${durationMs / 1.5}ms ease-in-out, width ${durationMs / 3}ms ease-in-out`;
-            element.style.color = "#fff0";
-            
-            // 33% Start Resize
-            setTimeout(() => {
-                element.style.width = `${newWidth}px`;
-            }, durationMs / 3);
-
-            // 50% Change Text, Start Fade In
-            setTimeout(() => {
+        function animateWidthChange2() {    
+            if (durationMs === 0) {
                 element.innerHTML = newText.replaceAll("\n", "<br>");
-                element.style.color = element.oldColor;
-            }, durationMs / 2);
+            } else {    
+                // 0% Add Transition, Start Fade Out
+                element.style.transition = `color ${durationMs / 1.5}ms ease-in-out, width ${durationMs / 3}ms ease-in-out`;
+                element.style.color = "#fff0";
 
-            // 100% Remove Transition
-            setTimeout(() => {
-                element.style.transition = element.oldTransition;
-                element.users -= 1;
-                if (element.users === 0) {
-                    element.oldColor = undefined;
-                    element.oldTransition = undefined;
-                    element.users = undefined;
-                }
-            }, durationMs);
-        }, delayMs);
+                // 33% Start Resize
+                setTimeout(() => {
+                    element.style.width = `${newWidth}px`;
+                }, durationMs / 3);
+
+                // 50% Change Text, Start Fade In
+                setTimeout(() => {
+                    element.innerHTML = newText.replaceAll("\n", "<br>");
+                    element.style.color = element.oldColor;
+                }, durationMs / 2);
+
+                // 100% Remove Transition
+                setTimeout(() => {
+                    element.style.transition = element.oldTransition;
+                    element.users -= 1;
+                    if (element.users === 0) {
+                        element.oldColor = undefined;
+                        element.oldTransition = undefined;
+                        element.users = undefined;
+                    }
+                }, durationMs);
+            }
+        }
+
+        // Wait for Delay
+        if (delayMs === 0) {
+            animateWidthChange2();
+        } else {
+            setTimeout(animateWidthChange2(), delayMs);
+        }
     }
 
     // Takes an element containing either no children or one child that is an image and animates the change to the new image.
     function animateImageChange(imgContainer, newImage, durationMs = 400, delayMs = 0) {
-        setTimeout(() => {
-            imgContainer.style.opacity = 0;
-            imgContainer.style.transition = `opacity ${durationMs / 2}ms ease-in-out`;
-            setTimeout(() => {
-                if (imgContainer.firstChild !== null) imgContainer.firstChild.remove();
-                if (newImage !== null) imgContainer.append(newImage);
-                imgContainer.style.opacity = 1;
-            }, durationMs / 2);
-        }, delayMs);
+        function animateImageChange2() {
+            if (durationMs === 0) {
+                animateImageChange3();
+            } else {    
+                imgContainer.style.opacity = 0;
+                imgContainer.style.transition = `opacity ${durationMs / 2}ms ease-in-out`;
+                setTimeout(animateImageChange3, durationMs / 2);
+            }
+        }
+
+        function animateImageChange3() {
+            if (imgContainer.firstChild !== null) imgContainer.firstChild.remove();
+            if (newImage !== null) imgContainer.append(newImage);
+            imgContainer.style.opacity = 1;
+        }
+
+        if (delayMs === 0) {
+            animateImageChange2();
+        } else {
+            setTimeout(animateImageChange2, delayMs);
+        }
     }
 
     const nav = document.getElementById("nav");
+    const main = document.getElementById("main");
+    const aside = document.getElementById("aside");
+
     const navResults = document.getElementById("nav-results");
     const indexSearch = document.getElementById("index-search");
     const noResults = document.getElementById("no-results");
@@ -826,14 +975,41 @@
     window.addEventListener("load", () => {
         resources.forEach(resource => resource.setupA());
         resources.forEach(resource => resource.setupB());
-        lockNavSize();
-        resources[0].select(false);
+        if (!isMobile()) lockNavSize();
+        if (!isMobile()) resources[0].select(false);
+        if (isMobile()) showNavMobile();
     });
     
     window.addEventListener("resize", () => {
-        lockNavSize();
+        if (!isMobile()) lockNavSize();
         selected.select(false);
     });
+
+    function isMobile() {
+        return screen.width <= 600;
+    }
+
+    function showNavMobile() {
+        if (!isMobile()) return;
+        nav.classList.remove("hidden");
+        main.classList.add("hidden");
+        aside.classList.add("hidden");
+    }
+
+    function showMainMobile() {
+        if (!isMobile()) return;
+        nav.classList.add("hidden");
+        main.classList.remove("hidden");
+        aside.classList.add("hidden");
+    }
+
+    function showAsideMobile() {
+        if (!isMobile()) return;
+        nav.classList.add("hidden");
+        main.classList.add("hidden");
+        aside.classList.remove("hidden");
+        this.selected.linkage.show();
+    }
 
     function navigate(isUp) {
         const results = [...navResults.children].filter((el) => {return !el.hidden});
@@ -906,6 +1082,7 @@
                 resource.hide();
             }
         });
+        showNavMobile();
     }
 </script>
 <script id="script-config">
