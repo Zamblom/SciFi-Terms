@@ -496,6 +496,7 @@
             this.indexElement = document.createElement("button");
             this.image = new Image();
             this.image.src = `./Images/${this.name}.png`;
+            this.image.alt = " ";
             this.iconPST = this.image.cloneNode();
             this.iconInput = this.image.cloneNode();
             this.iconOutput = this.image.cloneNode();
@@ -793,7 +794,7 @@
 
             const animated = !isMobile();
             const image = (this.isPrimary || this.isSecondary || this.isTertiary) ? resource.iconPST : (this.isInput ? resource.iconInput : (this.isOutput ? resource.iconOutput : null));
-            animateImageChange(this.icon, image, animated ? 500 : 0, animated ? 300 : 0);
+            animateImageChange(this.iconBox, image, animated ? 500 : 0, animated ? 300 : 0);
             
             let fontSize = isMobile() ? 10 : 15;
             this.nameBox.style.fontSize = `${fontSize}px`;
@@ -898,6 +899,7 @@
 
         function animateWidthChange2() {    
             if (durationMs === 0) {
+                element.style.width = `${newWidth}px`;
                 element.innerHTML = newText.replaceAll("\n", "<br>");
             } else {    
                 // 0% Add Transition, Start Fade Out
@@ -1031,6 +1033,7 @@
         nav.classList.remove("hidden");
         main.classList.add("hidden");
         aside.classList.add("hidden");
+        [...document.body.getElementsByTagName("svg")].forEach((el) => {el.remove()});
     }
 
     function showMainMobile() {
@@ -1038,6 +1041,7 @@
         nav.classList.add("hidden");
         main.classList.remove("hidden");
         aside.classList.add("hidden");
+        [...document.body.getElementsByTagName("svg")].forEach((el) => {el.remove()});
     }
 
     function showAsideMobile() {
@@ -1087,7 +1091,7 @@
         search("");
         nav.style.width = "min-content";
         setTimeout(() => {
-            const fixedSize = nav.clientWidth
+            const fixedSize = nav.clientWidth;
             nav.style.width = fixedSize + "px";
             search(indexSearch.value);
         }, 1);
