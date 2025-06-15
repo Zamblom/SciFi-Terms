@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SciFi Terms</title>
+    <link rel="shortcut icon" href="favicon.png" type="image/x-icon">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap');
 
@@ -358,6 +359,9 @@
             this.category = category;
             this.linkage = linkage;
             this.indexElement = document.createElement("button");
+            this.image = new Image();
+            this.image.src = `./Images/${this.name}.png`;
+            this.icon = this.image.cloneNode();
         }
 
         setupA() {
@@ -393,7 +397,7 @@
             if (selected === null || this.category !== selected.category) {
                 animateWidthChange(resourceCategory, this.category, animated ? 400 : 0, animated ? 100 : 0);
             }
-            animateImageChange(resourceImage, `./Images/${this.name}.png`, animated ? 600 : 0, animated ? 200 : 0);
+            animateImageChange(resourceImage, this.image, animated ? 600 : 0, animated ? 200 : 0);
         }
 
         show() {
@@ -616,7 +620,7 @@
             this.iconBox = document.createElement("div");
             this.append(this.iconBox);
 
-            this.icon = document.createElement("img");
+            this.icon = new Image();
             this.icon.alt = " ";
             this.iconBox.append(this.icon);
 
@@ -639,7 +643,7 @@
                 }
             }
 
-            animateImageChange(this.icon, `./Images/${resource.name}.png`, 500, 300);
+            animateImageChange(this.icon, resource.icon, 500, 300);
             
             let fontSize = 15;
             this.nameBox.style.fontSize = `${fontSize}px`;
@@ -659,7 +663,7 @@
         }
 
         hide() {
-            animateImageChange(this.icon, "", 500, 300);
+            animateImageChange(this.icon, null, 500, 300);
             this.inputArrow.hide("fade");
             this.outputArrow.hide("fade");
             this.classList.add("hidden");
@@ -680,6 +684,7 @@
         return res[0];
     }
 
+    // Takes an element containing no children and any text and animates the height change to the new text.
     function animateHeightChange(element, newText, durationMs = 400, delayMs = 0) {
         element.oldColor = element.oldColor !== undefined ? element.oldColor : element.style.color;
         element.oldTransition = element.oldTransition !== undefined ? element.oldTransition : element.style.transition;
@@ -722,6 +727,7 @@
         }, delayMs);
     }
 
+    // Takes an element containing no children and any text and animates the width change to the new text.
     function animateWidthChange(element, newText, durationMs = 400, delayMs = 0) {
         element.oldColor = element.oldColor !== undefined ? element.oldColor : element.style.color;
         element.oldTransition = element.oldTransition !== undefined ? element.oldTransition : element.style.transition;
@@ -759,13 +765,15 @@
         }, delayMs);
     }
 
-    function animateImageChange(imgElement, newSrc, durationMs = 400, delayMs = 0) {
+    // Takes an element containing either no children or one child that is an image and animates the change to the new image.
+    function animateImageChange(imgContainer, newImage, durationMs = 400, delayMs = 0) {
         setTimeout(() => {
-            imgElement.style.opacity = 0;
-            imgElement.style.transition = `opacity ${durationMs / 2}ms ease-in-out`;
+            imgContainer.style.opacity = 0;
+            imgContainer.style.transition = `opacity ${durationMs / 2}ms ease-in-out`;
             setTimeout(() => {
-                imgElement.src = newSrc;
-                imgElement.style.opacity = 1;
+                if (imgContainer.firstChild !== null) imgContainer.firstChild.remove();
+                if (newImage !== null) imgContainer.append(newImage);
+                imgContainer.style.opacity = 1;
             }, durationMs / 2);
         }, delayMs);
     }
@@ -775,7 +783,7 @@
     const indexSearch = document.getElementById("index-search");
     const noResults = document.getElementById("no-results");
     const resourceName = document.getElementById("resource-name").firstChild;
-    const resourceImage = document.getElementById("resource-image").firstChild;
+    const resourceImage = document.getElementById("resource-image");
     const resourceDescription = document.getElementById("resource-description").firstChild;
     const resourceCategory = document.getElementById("resource-category").firstChild;
 
