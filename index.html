@@ -10,8 +10,10 @@
 
         :root {
             --main-border: 2px solid #4a455e;
+            --main-border-button-mobile: #0d081f;
             --main-background: #362f49;
             --main-background-hover: #3b3350;
+            --main-background-button-mobile: #574c72;
             --main-text: #fff;
             --transparent-text: #fff0;
         }
@@ -83,6 +85,10 @@
                     margin-top: 2px;
                     padding: 5px 10px;
                     background-color: #13092e;
+                }
+                
+                button:first-letter {
+                    text-decoration: underline;
                 }
 
                 button:hover {
@@ -187,6 +193,10 @@
                     border-left: var(--main-border);
                     border-top-left-radius: 12px;
                     margin-left: auto;
+
+                    h2:first-letter {
+                        text-decoration: underline;
+                    }
                 }
             }
         }
@@ -240,6 +250,10 @@
                 margin: 0;
                 margin: 5px 0px 8px 5px;
             }
+            
+            p:first-letter {
+                text-decoration: underline;
+            }
         }
 
         linkage-node:hover {
@@ -249,10 +263,9 @@
 
         #primary {
             background-color: #694a2d;
-        }
-
-        #primary:hover {
-            background-color: #91663e;
+            p:first-letter {
+                text-decoration: none;
+            }
         }
 
         #secondary {
@@ -311,14 +324,32 @@
                 max-width: 100%;
 
                 #resource-name {
+                    background-color: var(--main-background-button-mobile);
+                    border-color: var(--main-border-button-mobile);
+
                     h1 {
                         font-size: 1.5em;
+                    }                    
+
+                    h1:first-letter {
+                        text-decoration: underline;
                     }
                 }
                 
                 #resource-footer {
                     #show-aside {
                         display: block;
+                        background-color: var(--main-background-button-mobile);
+                        border-color: var(--main-border-button-mobile);
+                        
+                        h2:first-letter {
+                            text-decoration: underline;
+                        }
+                    }
+
+                    #resource-category {    
+                        background-color: var(--main-background-button-mobile);
+                        border-color: var(--main-border-button-mobile);
                     }
                 }
             }
@@ -343,7 +374,13 @@
             }
 
             linkage-node {
-                padding-bottom: 20px;
+                padding-bottom: 10px;
+            }
+
+            #primary {
+                p:first-letter {
+                    text-decoration: underline;
+                }
             }
         }
 
@@ -758,7 +795,7 @@
             const image = (this.isPrimary || this.isSecondary || this.isTertiary) ? resource.iconPST : (this.isInput ? resource.iconInput : (this.isOutput ? resource.iconOutput : null));
             animateImageChange(this.icon, image, animated ? 500 : 0, animated ? 300 : 0);
             
-            let fontSize = 15;
+            let fontSize = isMobile() ? 10 : 15;
             this.nameBox.style.fontSize = `${fontSize}px`;
             this.nameBox.style.lineHeight = "20px";
 
